@@ -1,12 +1,18 @@
 import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 access_token = None
-api_url = 'https://cir-wifi-interface-b7agk5thba-uc.a.run.app'
+api_url = os.getenv('API_URL', default='https://cir-wifi-interface-b7agk5thba-uc.a.run.app')
 
 
 def get_request_method(method: str):
     if method == 'post':
         return requests.post
+    elif method == 'put':
+        return requests.put
     elif method == 'get':
         return requests.get
     elif method == 'delete':
@@ -86,6 +92,13 @@ def create_device_by_customer_id(device_id: str, public_key_format: str, custome
     )
 
 
+def adopt_device_by_customer_id(device_id: str, customer_id: str):
+    return api_request(
+        'put',
+        f'customers/{customer_id}/devices/{device_id}'
+    )
+
+
 def delete_device_by_id(device_id: str, customer_id: str):
     return api_request('delete', f'customers/{customer_id}/devices/{device_id}')
 
@@ -103,4 +116,11 @@ def create_command_by_device_id(customer_id, device_id, name: str, package: str)
         'post',
         f'customers/{customer_id}/devices/{device_id}/commands',
         dict(name=name, package=package, device_id=device_id)
+    )
+
+
+def find_commands_by_device_id(customer_id, device_id):
+    return api_request(
+        'get',
+        f'customers/{customer_id}/devices/{device_id}/commands',
     )
