@@ -4,17 +4,19 @@ from sdk import (
     adopt_device_by_customer_id,
     find_device_by_id,
     find_devices_by_customer_id,
-    create_command_by_device_id,
+    send_command_by_device_id,
     find_commands_by_device_id,
     set_access_token,
-    login
+    login,
+    update_user_password
 )
 import uuid
+import os
 
 
-CUSTOMER_ID = 'super_food'
-USER_EMAIL = 'user@superfood.com'
-USER_PASSWORD = '123abc'
+CUSTOMER_ID = os.getenv('CUSTOMER_ID')
+USER_EMAIL = os.getenv('USER_EMAIL')
+USER_PASSWORD = os.getenv('USER_PASSWORD')
 
 
 def test_login():
@@ -28,7 +30,7 @@ def test_login():
 def test_create_user_by_customer_id():
     user_id = str(uuid.uuid4()).replace('-', '_')
     set_access_token(USER_EMAIL, USER_PASSWORD)
-    new_email = f'{user_id}@superfood.com'
+    new_email = f'{user_id}@{CUSTOMER_ID.replace(" ", "")}.com'
     user, _ = create_user_by_customer_id(email=new_email, password=USER_PASSWORD, customer_id=CUSTOMER_ID)
 
     assert user is not None
@@ -47,6 +49,16 @@ def test_find_users_by_customer_id():
 
     for user in users:
         print(user)
+
+
+def test_update_user_password():
+    set_access_token(USER_EMAIL, USER_PASSWORD)
+    customer_id = CUSTOMER_ID
+    old_password = 'abc123'
+    new_password = '123abc'
+    result = update_user_password(customer_id, old_password, new_password)
+
+    assert result
 
 
 def test_adopt_device_by_customer_id():
@@ -83,7 +95,7 @@ def test_create_command_by_device_id():
     customer_id = CUSTOMER_ID
     device_id = f'cir-wifi-dev-b4a2eb41eb4b'
 
-    command, _ = create_command_by_device_id(
+    command, _ = send_command_by_device_id(
         customer_id,
         device_id,
         name='Estado de Cerradura',

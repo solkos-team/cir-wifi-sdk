@@ -111,7 +111,7 @@ def find_devices_by_customer_id(customer_id):
     return api_request('get', f'customers/{customer_id}/devices')
 
 
-def create_command_by_device_id(customer_id, device_id, name: str, package: str):
+def send_command_by_device_id(customer_id, device_id, name: str, package: str):
     return api_request(
         'post',
         f'customers/{customer_id}/devices/{device_id}/commands',
@@ -123,4 +123,12 @@ def find_commands_by_device_id(customer_id, device_id):
     return api_request(
         'get',
         f'customers/{customer_id}/devices/{device_id}/commands',
+    )
+
+
+def update_user_password(customer_id, old_password, new_password):
+    return api_request(
+        'put',
+        f'customers/{customer_id}/users/password',
+        dict(old_password=old_password, new_password=new_password)
     )
