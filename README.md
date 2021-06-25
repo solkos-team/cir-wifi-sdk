@@ -15,7 +15,6 @@ USER_PASSWORD=*****
 1. Lock:
 ```python
 command, error = send_command_by_device_id(
-    customer_id,
     device_id,
     name='Lock',
     package='a013a17efe9e7a3f69ec4a4a53b749cd7a60b0'
@@ -24,7 +23,6 @@ command, error = send_command_by_device_id(
 2. Unlock:
 ```python
 command, error = send_command_by_device_id(
-    customer_id,
     device_id,
     name='Unlock',
     package='a013a17efe9e7a3f69ec4a4a53b749cd7a60b1'

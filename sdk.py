@@ -68,67 +68,66 @@ def find_customer_by_id(customer_id: str):
     return api_request('get', f'customers/{customer_id}')
 
 
-def create_user_by_customer_id(email: str, password: str, customer_id: str):
+def create_user(email: str, password: str):
     return api_request(
         'post',
-        f'customers/{customer_id}/users',
-        dict(email=email, password=password, customer_id=customer_id)
+        f'users',
+        dict(email=email, password=password)
     )
 
 
-def delete_user_by_id(user_id: str, customer_id: str):
-    return api_request('delete', f'customers/{customer_id}/users/{user_id}')
+def delete_user_by_id(user_id: str):
+    return api_request('delete', f'users/{user_id}')
 
 
-def find_users_by_customer_id(customer_id):
-    return api_request('get', f'customers/{customer_id}/users')
+def find_users():
+    return api_request('get', f'users')
 
 
-def create_device_by_customer_id(device_id: str, public_key_format: str, customer_id: str):
-    return api_request(
-        'post',
-        f'customers/{customer_id}/devices',
-        dict(id=device_id, public_key_format=public_key_format, customer_id=customer_id)
-    )
-
-
-def adopt_device_by_customer_id(device_id: str, customer_id: str):
+def adopt_device_by_serial_number(serial_number: str):
     return api_request(
         'put',
-        f'customers/{customer_id}/devices/{device_id}'
+        f'devices',
+        dict(serial_number=serial_number)
     )
 
 
-def delete_device_by_id(device_id: str, customer_id: str):
-    return api_request('delete', f'customers/{customer_id}/devices/{device_id}')
+def delete_device_by_id(device_id: str):
+    return api_request('delete', f'devices/{device_id}')
 
 
-def find_device_by_id(customer_id: str, device_id: str):
-    return api_request('get', f'customers/{customer_id}/devices/{device_id}')
+def find_device_by_id( device_id: str):
+    return api_request('get', f'devices/{device_id}')
 
 
-def find_devices_by_customer_id(customer_id):
-    return api_request('get', f'customers/{customer_id}/devices')
+def get_devices():
+    return api_request('get', f'devices')
 
 
-def send_command_by_device_id(customer_id, device_id, name: str, package: str):
+def send_command_by_device_id( device_id, name: str, package: str):
     return api_request(
         'post',
-        f'customers/{customer_id}/devices/{device_id}/commands',
+        f'devices/{device_id}/commands',
         dict(name=name, package=package, device_id=device_id)
     )
 
-
-def find_commands_by_device_id(customer_id, device_id):
+def link_user_with_customer(customer_id:str, user_id: int):
     return api_request(
-        'get',
-        f'customers/{customer_id}/devices/{device_id}/commands',
+        'put',
+        f'customers/{customer_id}/users/{user_id}'
     )
 
 
-def update_user_password(customer_id, old_password, new_password):
+def find_commands_by_device_id(device_id):
+    return api_request(
+        'get',
+        f'devices/{device_id}/commands',
+    )
+
+
+def update_user_password(old_password, new_password):
     return api_request(
         'put',
-        f'customers/{customer_id}/users/password',
+        f'users/password',
         dict(old_password=old_password, new_password=new_password)
     )

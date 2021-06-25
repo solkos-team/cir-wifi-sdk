@@ -1,9 +1,9 @@
 from sdk import (
-    create_user_by_customer_id,
-    find_users_by_customer_id,
-    adopt_device_by_customer_id,
+    create_user,
+    find_users,
+    adopt_device_by_serial_number,
     find_device_by_id,
-    find_devices_by_customer_id,
+    get_devices,
     send_command_by_device_id,
     find_commands_by_device_id,
     set_access_token,
@@ -27,11 +27,11 @@ def test_login():
     print(token)
 
 
-def test_create_user_by_customer_id():
+def test_create_user():
     user_id = str(uuid.uuid4()).replace('-', '_')
     set_access_token(USER_EMAIL, USER_PASSWORD)
     new_email = f'{user_id}@{CUSTOMER_ID.replace(" ", "")}.com'
-    user, _ = create_user_by_customer_id(email=new_email, password=USER_PASSWORD, customer_id=CUSTOMER_ID)
+    user, _ = create_user(email=new_email, password=USER_PASSWORD)
 
     assert user is not None
     assert user['email'] == new_email
@@ -41,8 +41,7 @@ def test_create_user_by_customer_id():
 
 def test_find_users_by_customer_id():
     set_access_token(USER_EMAIL, USER_PASSWORD)
-    customer_id = CUSTOMER_ID
-    users, _ = find_users_by_customer_id(customer_id)
+    users, _ = find_users()
 
     assert users is not None
     assert len(users)
@@ -53,35 +52,37 @@ def test_find_users_by_customer_id():
 
 def test_update_user_password():
     set_access_token(USER_EMAIL, USER_PASSWORD)
-    customer_id = CUSTOMER_ID
-    old_password = 'abc123'
+    
+    old_password = USER_PASSWORD
     new_password = '123abc'
-    result = update_user_password(customer_id, old_password, new_password)
+    result = update_user_password(old_password, new_password)
+
+    assert result
+
+    result = update_user_password(new_password, old_password)
 
     assert result
 
 
-def test_adopt_device_by_customer_id():
+def test_adopt_device_by_serial_number():
     set_access_token(USER_EMAIL, USER_PASSWORD)
-    customer_id = CUSTOMER_ID
-    device_id = 'cir-wifi-dev-b4a2eb41eb4b'
-    device, _ = adopt_device_by_customer_id(device_id=device_id, customer_id=customer_id)
+    serial_number = '000000789210300053'
+    device, _ = adopt_device_by_serial_number(serial_number=serial_number)
 
     assert device is not None
 
     print(device)
 
-    device, _ = find_device_by_id(customer_id, device_id)
+    device, _ = find_device_by_id( device["id"])
 
     assert device is not None
 
     print(device)
 
 
-def test_find_devices_by_customer_id():
+def test_find_devices():
     set_access_token(USER_EMAIL, USER_PASSWORD)
-    customer_id = CUSTOMER_ID
-    devices, _ = find_devices_by_customer_id(customer_id)
+    devices, _ = get_devices()
 
     assert devices is not None
     assert len(devices)
@@ -92,11 +93,14 @@ def test_find_devices_by_customer_id():
 
 def test_create_command_by_device_id():
     set_access_token(USER_EMAIL, USER_PASSWORD)
-    customer_id = CUSTOMER_ID
-    device_id = f'cir-wifi-dev-b4a2eb41eb4b'
+    
+    devices, _ = get_devices()
+
+    assert devices is not None
+    
+    device_id = devices[0]["id"]
 
     command, _ = send_command_by_device_id(
-        customer_id,
         device_id,
         name='Estado de Cerradura',
         package='a013a17efe9e7a3f69ec4a4a53b749cd7a60b1'
@@ -112,10 +116,14 @@ def test_create_command_by_device_id():
 
 def test_find_commands_by_device_id():
     set_access_token(USER_EMAIL, USER_PASSWORD)
-    customer_id = CUSTOMER_ID
-    device_id = f'cir-wifi-dev-b4a2eb41eb4b'
+    
+    devices, _ = get_devices()
 
-    commands, _ = find_commands_by_device_id(customer_id, device_id)
+    assert devices is not None
+    
+    device_id = devices[0]["id"]
+
+    commands, _ = find_commands_by_device_id(device_id)
 
     assert commands is not None
     assert len(commands) > 0
