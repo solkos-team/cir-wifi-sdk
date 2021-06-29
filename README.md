@@ -13,6 +13,10 @@ USER_PASSWORD=*****
 
 ## Sdk Functions
 
+Api call schema sample: `response, error = function(params)`.  
+The error will be empty if there is no problem in the request(look at test/test_sdk.py to get a better idea about the schema).
+
+
 ### **set_access_token**
     Set the access token for given credentials to allow use of sdk functions
 
