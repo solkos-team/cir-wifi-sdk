@@ -282,10 +282,11 @@ def get_lock_status_by_device(device_id: str):
     Returns:
         dict: Status of Lock, door:locked for locked and door: unlocked in data field.
     """
-    return api_request('get', f'devices/{device_id}/look')
+    return api_request('get', f'devices/{device_id}/lock')
 
-def suscribe_webhook(callback: str, auth_required: bool = False, auth_value: str = ""):
-    """Suscribe to webhook to receive event changes by device
+
+def subscribe_webhook(callback: str, auth_required: bool = False, auth_value: str = ""):
+    """Subscribe to webhook to receive event changes by device
 
     Args:
         callback (str): url of the webhook
@@ -301,8 +302,8 @@ def suscribe_webhook(callback: str, auth_required: bool = False, auth_value: str
         dict(callback=callback, auth_required=auth_required, auth_value=auth_value)
     )
 
-def unsuscribe_webhook():
-    """Unsuscribe the webhook, this process is required if events are no longer needed
+def unsubscribe_webhook():
+    """Unsubscribe the webhook, this process is required if events are no longer needed
 
     Returns:
         dict: callback data

@@ -8,7 +8,11 @@ from sdk import (
     find_commands_by_device_id,
     set_access_token,
     login,
-    update_user_password
+    update_user_password,
+    get_door_status_by_device,
+    get_lock_status_by_device,
+    subscribe_webhook,
+    unsubscribe_webhook
 )
 import uuid
 import os
@@ -127,3 +131,48 @@ def test_find_commands_by_device_id():
 
     assert commands is not None
     assert len(commands) > 0
+
+
+def test_get_door_status():
+    set_access_token(USER_EMAIL, USER_PASSWORD)
+
+    devices, _ = get_devices()
+
+    assert devices is not None
+    
+    device_id = devices[0]["id"]
+
+    status, _ = get_door_status_by_device(device_id)
+
+    print(status)
+    assert status is not None
+
+
+def test_get_lock_status():
+    set_access_token(USER_EMAIL, USER_PASSWORD)
+
+    devices, _ = get_devices()
+
+    assert devices is not None
+    
+    device_id = devices[0]["id"]
+
+    status, _ = get_lock_status_by_device(device_id)
+
+    print(status)
+    assert status is not None
+
+def test_subscribe_and_unsubscribe_webhook():
+    set_access_token(USER_EMAIL, USER_PASSWORD)
+
+    # This could be your url or exposed service.
+    callback, _ = subscribe_webhook("https://cir-wifi-interface-b7agk5thba-uc.a.run.app/devices/events/suscribe/test")
+
+    print(callback)
+    # Ready to receive events
+    assert callback
+
+    callback, _ = unsubscribe_webhook()
+
+    # Events will no longer received
+    assert callback
