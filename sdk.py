@@ -259,3 +259,55 @@ def update_user_password(old_password, new_password):
         f'users/password',
         dict(old_password=old_password, new_password=new_password)
     )
+
+
+def get_door_status_by_device(device_id: str):
+    """Get current door opening status
+
+    Args:
+        device_id (str): Device id with format "cir-wifi-dev-{mac}"
+
+    Returns:
+        dict: Status of door, if data is 0 is closed, otherwise is open
+    """
+    return api_request('get', f'devices/{device_id}/door')
+
+
+def get_lock_status_by_device(device_id: str):
+    """Get current Lock status by device (currently just work if it wasn't a bluetooth command)
+
+    Args:
+        device_id (str): Device id with format "cir-wifi-dev-{mac}"
+
+    Returns:
+        dict: Status of Lock, door:locked for locked and door: unlocked in data field.
+    """
+    return api_request('get', f'devices/{device_id}/look')
+
+def suscribe_webhook(callback: str, auth_required: bool = False, auth_value: str = ""):
+    """Suscribe to webhook to receive event changes by device
+
+    Args:
+        callback (str): url of the webhook
+        auth_required (bool, optional): not implemented. Defaults to False.
+        auth_value (str, optional): not implemented. Defaults to "".
+
+    Returns:
+        dict: callback data
+    """
+    return api_request(
+        'post',
+        f'devices/events/suscribe',
+        dict(callback=callback, auth_required=auth_required, auth_value=auth_value)
+    )
+
+def unsuscribe_webhook():
+    """Unsuscribe the webhook, this process is required if events are no longer needed
+
+    Returns:
+        dict: callback data
+    """
+    return api_request(
+        'delete',
+        f'devices/events/unsuscribe'
+    )

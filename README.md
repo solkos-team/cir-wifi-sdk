@@ -1,4 +1,25 @@
 # CIR Wifi SDK v1.0
+
+## Menu
+1. [Steps to run tests](#steps-to-run-tests)
+2. [Sdk functions](#sdk-functions)
+    1. [set_access_token](#set_access_token)
+    2. [login](#login)
+    3. [find_customer_by_id](#find_customer_by_id)
+    4. [find_users](#find_users)
+    5. [adopt_device_by_serial_number](#adopt_device_by_serial_number)
+    6. [delete_device_by_id](#delete_device_by_id)
+    7. [find_device_by_id](#find_device_by_id)
+    8. [get_devices](#get_devices)
+    9. [send_command_by_device_id](#send_command_by_device_id)
+    10. [find_commands_by_device_id](#find_commands_by_device_id)
+    11. [update_user_password](#update_user_password)
+    12. [get_door_status_by_device](#get_door_status_by_device)
+    13. [get_lock_status_by_device](#get_lock_status_by_device)
+    14. [subscribe_webhook](#subscribe_webhook)
+    15. [unsubscribe_webhook](#unsubscribe_webhook)
+3. [Command list](#Command-list-that-the-device-supports)
+
 ## Steps to run tests
 1. Requesting Imbera team to create customer/user/password credentials
 2. Create virtual env: https://docs.python.org/3/library/venv.html
@@ -137,6 +158,61 @@ params
 
 returns
 - dict: user data
+
+<br>
+
+### **get_door_status_by_device**
+    Get current door opening status
+
+params
+- device_id :str -> Device id with format "cir-wifi-dev-{mac}"
+
+returns
+- dict: Status of door, if data is 0 is closed, otherwise is open
+
+<br>
+
+### **get_lock_status_by_device**
+    Get current Lock status by device (currently just work if it wasn't a bluetooth command)
+
+params
+- device_id :str -> Device id with format "cir-wifi-dev-{mac}"
+
+returns
+- dict: Status of Lock, door:locked for locked and door: unlocked in data field.
+
+<br>
+
+### **subscribe_webhook**
+    Subscribe to the webhook to receive event changes by the device.
+    Note: Currently we only accept webhooks without authentication, and it's possible that this endpoint will be changing over time allowing 
+    users to add authentication for their Webhooks.
+
+    This will send a request to the webhook every time that a device detects a change in their values.
+
+    The request will have a body with the following.
+    {
+        "device_id": "str",
+        "event_type": "str",
+        "event_data": "str",
+        "event_date": "datetime"
+    }
+    Currently just is possible to subscribe one webhook by customer.
+
+params
+- callback: str -> url of the webhook
+- auth_required: bool, optional -> Set to false (work in progress).
+- auth_value: str, optional -> Set to "" (work in progress).
+
+returns
+- dict: callback data.
+
+<br>
+
+### **unsubscribe_webhook**
+    Unsuscribe the webhook, this process is required if events are no longer needed
+returns
+- dict : callback data
 
 <br>
 
