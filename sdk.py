@@ -1,6 +1,8 @@
+from typing import List, Optional
 import requests
 import os
 from dotenv import load_dotenv
+from urllib.parse import urlencode
 
 load_dotenv()
 
@@ -184,15 +186,28 @@ def find_device_by_id( device_id: str):
     return api_request('get', f'devices/{device_id}')
 
 
-def get_devices():
+def get_devices(
+        page_size: Optional[int]=None, 
+        page_number: Optional[int]=None):
     """Get all adopted devices, if user has already a company, then 
     will be displayed all devices from that company, if user don't 
     have a company then just return their adopted devices.
 
+    Args:
+        page_size (Optional, int): Page size of the data, defaults to 100.
+        page_number (Optional, int): Page number of the data, defaults to 1.
+    
     Returns:
         List[dict]: List of devices
+
     """
-    return api_request('get', f'devices')
+    
+    if page_size and page_number:
+        query = urlencode({"page_size": page_size, "page_number": page_number})
+        path = f'devices?{query}'
+    else:
+        path = f'devices'
+    return api_request('get', path)
 
 
 def send_command_by_device_id( device_id: str, name: str, package: str):
@@ -229,19 +244,27 @@ def link_user_with_customer(customer_id:str, user_id: int):
     )
 
 
-def find_commands_by_device_id(device_id):
+def find_commands_by_device_id(
+        device_id: str,
+        page_size: Optional[int]=None, 
+        page_number: Optional[int]=None):
     """find all commands sent by this user to the given device
 
     Args:
         device_id (str): Device id with format "cir-wifi-dev-{mac}"
+        page_size (Optional, int): Page size of the data, defaults to 100.
+        page_number (Optional, int): Page number of the data, defaults to 1.
 
     Returns:
         List[dict]: list of commands
     """
-    return api_request(
-        'get',
-        f'devices/{device_id}/commands',
-    )
+    
+    if page_size and page_number:
+        query = urlencode({"page_size": page_size, "page_number": page_number})
+        path = f'devices/{device_id}/commands?{query}'
+    else:
+        path = f'devices/{device_id}/commands'
+    return api_request('get', path)
 
 
 def update_user_password(old_password, new_password):
@@ -311,4 +334,77 @@ def unsubscribe_webhook():
     return api_request(
         'delete',
         f'devices/events/unsuscribe'
+    )
+
+
+def get_event_data(
+        device_id: str, 
+        variable_id: str, 
+        start_at: str, 
+        interval: int=100):
+    """Fetch data from start date until interval count, max 1000
+    records per request
+
+    Args:
+        device_id (str): Device id with format "cir-wifi-dev-{mac}"
+        variable_id (str): The data variable to extract like "v24"
+        start_at (str): Start at date in ISO  ISO 8601 format, YYYY-MM-DDTHH:MM:SS[.mmmmmm][+HH:MM]
+        interval (int, optional): Number of records to retrieve. Defaults to 100.
+
+    Returns:
+        List[dict]: List of event records.
+    """
+    return api_request(
+        'post',
+        f'devices/{device_id}/events/data',
+        {
+            "variable_id": variable_id,
+            "start_at": start_at,
+            "interval": interval
+        }
+    )
+
+
+def get_measures_data(
+        device_id: str, 
+        variable_id: str, 
+        start_at: str, 
+        interval: int=100):
+    """Fetch data of measures in intervals of 30 minutes, max 1000
+    records per request
+
+    Args:
+        device_id (str): Device id with format "cir-wifi-dev-{mac}" 
+        variable_id (str): Variable of the measure, like "32"
+        start_at (str): Start at date in ISO  ISO 8601 format, YYYY-MM-DDTHH:MM:SS[.mmmmmm][+HH:MM]
+        interval (int, optional): Number of records to retrieve. Defaults to 100.
+
+    Returns:
+        List[dict]: List of measure records
+    """
+    return api_request(
+        'post',
+        f'devices/{device_id}/measures/data',
+        {
+            "variable_id": variable_id,
+            "start_at": start_at,
+            "interval": interval
+        }
+    )
+
+def adopt_by_device_list(serial_numbers : List[str]):
+    """Adopts a list of devices
+
+    Args:
+        serial_numbers (List[str]): List of serial numbers
+
+    Returns:
+        dict: Structure with two List, one of adopted devices and other of errors
+    """
+    return api_request(
+        'put',
+        f'devices/list',
+        {
+            "serie": serial_numbers
+        }
     )

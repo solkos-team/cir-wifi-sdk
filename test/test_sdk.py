@@ -1,9 +1,13 @@
 from sdk import (
+    adopt_by_device_list,
     create_user,
+    delete_device_by_id,
     find_users,
     adopt_device_by_serial_number,
     find_device_by_id,
     get_devices,
+    get_event_data,
+    get_measures_data,
     send_command_by_device_id,
     find_commands_by_device_id,
     set_access_token,
@@ -162,6 +166,7 @@ def test_get_lock_status():
     print(status)
     assert status is not None
 
+
 def test_subscribe_and_unsubscribe_webhook():
     set_access_token(USER_EMAIL, USER_PASSWORD)
 
@@ -176,3 +181,106 @@ def test_subscribe_and_unsubscribe_webhook():
 
     # Events will no longer received
     assert callback
+
+
+def test_subscribe_and_unsubscribe_webhook_with_auth():
+    set_access_token(USER_EMAIL, USER_PASSWORD)
+
+    # Unsubscribe if a callback exists
+    callback, _ = unsubscribe_webhook()
+
+    # This could be your url or exposed service.
+    callback, _ = subscribe_webhook(
+        "https://cir-wifi-interface-b7agk5thba-uc.a.run.app/devices/events/suscribe/test"
+        ,True,
+        '0123456789'
+        )
+
+    print(callback)
+    # Ready to receive events
+    assert callback
+
+    callback, _ = unsubscribe_webhook()
+
+    # Events will no longer received
+    assert callback
+
+
+def test_get_data_measures():
+    set_access_token(USER_EMAIL, USER_PASSWORD)
+
+    devices, _ = get_devices()
+
+    assert devices is not None
+    
+    device_id = devices[0]["id"]
+
+    result, _ = get_event_data(device_id, 'v24', '2021-07-10T10:33:19.196Z')
+
+    print(result)
+    assert result == []
+
+
+def test_get_data_events():
+    set_access_token(USER_EMAIL, USER_PASSWORD)
+
+    devices, _ = get_devices()
+
+    assert devices is not None
+    
+    device_id = devices[0]["id"]
+
+    result, _ = get_measures_data(device_id, '32', '2021-07-10T10:33:19.196Z')
+
+    print(result)
+    assert result == []
+    
+
+def test_adoption_by_list_and_detach():
+    set_access_token(USER_EMAIL, USER_PASSWORD)
+
+    devices, _ = get_devices()
+
+    for device in devices:
+        delete_device_by_id(device["id"])
+
+    devices, error = adopt_by_device_list(['000000789210300053', '000000789210300054'])
+
+    print(error)
+    assert devices["results"]
+
+    devices, _ = get_devices()
+
+    for device in devices:
+        delete_device_by_id(device["id"])
+
+
+
+def test_devices_pagination():
+    set_access_token(USER_EMAIL, USER_PASSWORD)
+
+    devices, _ = get_devices(10, 1)
+
+    assert devices is not None
+    
+    devices, _ = get_devices(10, 20)
+
+    assert not devices
+
+
+def test_commands_pagination():
+    set_access_token(USER_EMAIL, USER_PASSWORD)
+
+    devices, _ = get_devices()
+
+    assert devices is not None
+    
+    device_id = devices[0]["id"]
+
+    commands, _ = find_commands_by_device_id(device_id, 10, 1)
+
+    assert commands is not None
+
+    commands, _ = find_commands_by_device_id(device_id, 100, 20)
+
+    assert not commands

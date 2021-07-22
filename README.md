@@ -18,6 +18,9 @@
     13. [get_lock_status_by_device](#get_lock_status_by_device)
     14. [subscribe_webhook](#subscribe_webhook)
     15. [unsubscribe_webhook](#unsubscribe_webhook)
+    16. [get_event_data](#get_event_data)
+    17. [get_measures_data](#get_measures_data)
+    18. [adopt_by_device_list](#adopt_by_device_list)
 3. [Command list](#Command-list-that-the-device-supports)
 
 ## Steps to run tests
@@ -116,12 +119,16 @@ returns
 <br>
 
 ### **get_devices**
-    Get all adopted devices, if user has already a company, then 
-    will be displayed all devices from that company, if user don't 
-    have a company then just return their adopted devices.
+    Get all adopted devices, if user has already a company, 
+    then will be displayed all devices from that company, 
+    if user don't have a company then just return their adopted devices.
+
+params:
+- page_size Optional int -> Page size of the data, defaults to 100.
+- page_number Optional, int -> Page number of the data, defaults to 1.
 
 returns
-- List[dict]: List of devices
+- List\[dict]: List of devices
 
 <br>
 
@@ -143,6 +150,8 @@ returns
 
 params
 - device_id :str -> Device id with format "cir-wifi-dev-{mac}"
+- page_size :Optional int -> Page size of the data, defaults to 100.
+- page_number :Optional, int -> Page number of the data, defaults to 1.
 
 returns
 - dict: list of commands
@@ -184,11 +193,14 @@ returns
 <br>
 
 ### **subscribe_webhook**
-    Subscribe to the webhook to receive event changes by the device.
-    Note: Currently we only accept webhooks without authentication, and it's possible that this endpoint will be changing over time allowing 
-    users to add authentication for their Webhooks.
+    Subscribe to the webhook to receive event changes by the 
+    device.
+    If Auth is active, this will make a request with 
+    Authorization header with the format 'Bearer {auth_value}', 
+    example: 'Bearer 12345'.
 
-    This will send a request to the webhook every time that a device detects a change in their values.
+    This will send a request to the webhook every time that a 
+    device detects a change in their values.
 
     The request will have a body with the following.
     {
@@ -215,6 +227,48 @@ returns
 - dict : callback data
 
 <br>
+
+### **get_event_data**
+    Fetch data from start date until interval count, max 1000
+    records per request.
+
+params
+- device_id :str -> Device id with format "cir-wifi-dev-{mac}"
+- variable_id :str -> The data variable to extract like "v24"
+- start_at :str -> Start at date in ISO  ISO 8601 format, YYYY-MM-DDTHH:MM:SS\[.mmmmmm]\[+HH:MM]
+- interval : Optional int -> Number of records to retrieve. Defaults to 100.
+
+returns
+- List\[dict]: List of event records.
+
+<br>
+
+### **get_measures_data**
+    Fetch data of measures in intervals of 30 minutes, max 1000
+    records per request
+
+params
+- device_id :str -> Device id with format "cir-wifi-dev-{mac}"
+- variable_id :str -> Variable of the measure, like "32"
+- start_at :str -> Start at date in ISO  ISO 8601 format, YYYY-MM-DDTHH:MM:SS\[.mmmmmm]\[+HH:MM]
+- interval : Optional int -> Number of records to retrieve. Defaults to 100.
+
+returns
+- List\[dict]: List of measure records.
+
+<br>
+
+### **adopt_by_device_list**
+    Adopts a list of devices
+
+params
+- serial_numbers :List\[str] -> List of serial numbers
+
+returns.
+- dict: Structure with two List, one of adopted devices and other of errors.
+
+<br>
+
 
 ## Command list that the device supports
 1. Lock:
