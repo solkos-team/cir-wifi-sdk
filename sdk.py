@@ -309,12 +309,14 @@ def get_lock_status_by_device(device_id: str):
 
 
 def subscribe_webhook(callback: str, auth_required: bool = False, auth_value: str = ""):
-    """Subscribe to webhook to receive event changes by device
+    """Subscribe to webhook to receive event changes by device.
+    If Auth is active, this will make a request with Authorization header with
+    the format 'Bearer auth_value'.
 
     Args:
         callback (str): url of the webhook
-        auth_required (bool, optional): not implemented. Defaults to False.
-        auth_value (str, optional): not implemented. Defaults to "".
+        auth_required (bool, optional): if Auth is required for this callback url. Defaults to False.
+        auth_value (str, optional): JSON Web Token to be sended as header. Defaults to "".
 
     Returns:
         dict: callback data
