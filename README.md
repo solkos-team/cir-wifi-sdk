@@ -3,24 +3,33 @@
 ## Menu
 1. [Steps to run tests](#steps-to-run-tests)
 2. [Sdk functions](#sdk-functions)
-    1. [set_access_token](#set_access_token)
-    2. [login](#login)
-    3. [find_customer_by_id](#find_customer_by_id)
-    4. [find_users](#find_users)
-    5. [adopt_device_by_serial_number](#adopt_device_by_serial_number)
-    6. [delete_device_by_id](#delete_device_by_id)
-    7. [find_device_by_id](#find_device_by_id)
-    8. [get_devices](#get_devices)
-    9. [send_command_by_device_id](#send_command_by_device_id)
-    10. [find_commands_by_device_id](#find_commands_by_device_id)
-    11. [update_user_password](#update_user_password)
-    12. [get_door_status_by_device](#get_door_status_by_device)
-    13. [get_lock_status_by_device](#get_lock_status_by_device)
-    14. [subscribe_webhook](#subscribe_webhook)
-    15. [unsubscribe_webhook](#unsubscribe_webhook)
-    16. [get_event_data](#get_event_data)
-    17. [get_measures_data](#get_measures_data)
-    18. [adopt_by_device_list](#adopt_by_device_list)
+    1. Authorization
+        1. [set_access_token](#set_access_token)
+        2. [login](#login)
+    2. Customers
+        1. [find_customer_by_id](#find_customer_by_id)
+    3. Users
+        1. [find_users](#find_users)
+        2. [update_user_password](#update_user_password)
+    4. Devices
+        1. [adopt_device_by_serial_number](#adopt_device_by_serial_number)
+        2. [delete_device_by_id](#delete_device_by_id)
+        3. [adopt_by_device_list](#adopt_by_device_list)
+        4. [find_device_by_id](#find_device_by_id)
+        5. [get_devices](#get_devices)
+        6. [get_door_status_by_device](#get_door_status_by_device)
+        7. [get_lock_status_by_device](#get_lock_status_by_device)
+    5. Commands
+        1. [send_command_by_device_id](#send_command_by_device_id)
+        2. [find_commands_by_device_id](#find_commands_by_device_id)
+    6. Webhook
+        1. [subscribe_webhook](#subscribe_webhook)
+        2. [unsubscribe_webhook](#unsubscribe_webhook)
+    7. Data
+        1. [get_catalog_of_variables](#get_catalog_of_variables)
+        2. [get_event_data](#get_event_data)
+        3. [get_measures_data](#get_measures_data)
+    
 3. [Command list](#Command-list-that-the-device-supports)
 
 ## Steps to run tests
@@ -40,6 +49,11 @@ USER_PASSWORD=*****
 Api call schema sample: `response, error = function(params)`.  
 The error will be empty if there is no problem in the request(look at test/test_sdk.py to get a better idea about the schema).
 
+<br>
+
+### Authorization
+
+<br>
 
 ### **set_access_token**
     Set the access token for given credentials to allow use of sdk functions
@@ -66,6 +80,10 @@ returns
 
 <br>
 
+### Customers
+
+<br>
+
 ### **find_customer_by_id**
     Find customer by given id, only if user is linked to them
 
@@ -77,11 +95,29 @@ returns
 
 <br>
 
+### Users
+
 ### **find_users**
     find users of linked company
 
 returns
 - List[dict]: list of users
+
+<br>
+
+### **update_user_password**
+    Update current user password to a new one
+
+params
+- old_password :str -> user old password
+- new_password :str -> user new password
+
+returns
+- dict: user data
+
+<br>
+
+### Devices
 
 <br>
 
@@ -107,6 +143,17 @@ returns
 
 <br>
 
+### **adopt_by_device_list**
+    Adopts a list of devices
+
+params
+- serial_numbers :List\[str] -> List of serial numbers
+
+returns.
+- dict: Structure with two List, one of adopted devices and other of errors.
+
+<br>
+
 ### **find_device_by_id**
     find device by the given device id
 
@@ -129,6 +176,32 @@ params:
 
 returns
 - List\[dict]: List of devices
+
+<br>
+
+### **get_door_status_by_device**
+    Get current door opening status
+
+params
+- device_id :str -> Device id with format "cir-wifi-dev-{mac}"
+
+returns
+- dict: Status of door, if data is 0 is closed, otherwise is open
+
+<br>
+
+### **get_lock_status_by_device**
+    Get current Lock status by device (currently just work if it wasn't a bluetooth command)
+
+params
+- device_id :str -> Device id with format "cir-wifi-dev-{mac}"
+
+returns
+- dict: Status of Lock, door:locked for locked and door: unlocked in data field.
+
+<br>
+
+### Commands
 
 <br>
 
@@ -158,37 +231,7 @@ returns
 
 <br>
 
-### **update_user_password**
-    Update current user password to a new one
-
-params
-- old_password :str -> user old password
-- new_password :str -> user new password
-
-returns
-- dict: user data
-
-<br>
-
-### **get_door_status_by_device**
-    Get current door opening status
-
-params
-- device_id :str -> Device id with format "cir-wifi-dev-{mac}"
-
-returns
-- dict: Status of door, if data is 0 is closed, otherwise is open
-
-<br>
-
-### **get_lock_status_by_device**
-    Get current Lock status by device (currently just work if it wasn't a bluetooth command)
-
-params
-- device_id :str -> Device id with format "cir-wifi-dev-{mac}"
-
-returns
-- dict: Status of Lock, door:locked for locked and door: unlocked in data field.
+### Webhook
 
 <br>
 
@@ -228,6 +271,18 @@ returns
 
 <br>
 
+### Data
+
+<br>
+
+### **get_catalog_of_variables**
+    Fetch the catalog of variables.
+
+returns
+- List\[dict]: List of variables.
+
+<br>
+
 ### **get_event_data**
     Fetch data from start date until interval count, max 1000
     records per request.
@@ -235,7 +290,7 @@ returns
 params
 - device_id :str -> Device id with format "cir-wifi-dev-{mac}"
 - variable_id :str -> The data variable to extract like "v24"
-- start_at :str -> Start at date in ISO  ISO 8601 format, YYYY-MM-DDTHH:MM:SS\[.mmmmmm]\[+HH:MM]
+- start_at :str -> Start at date in ISO 8601 format, YYYY-MM-DDTHH:MM:SS\[.mmmmmm]\[+HH:MM]
 - interval : Optional int -> Number of records to retrieve. Defaults to 100.
 
 returns
@@ -250,25 +305,13 @@ returns
 params
 - device_id :str -> Device id with format "cir-wifi-dev-{mac}"
 - variable_id :str -> Variable of the measure, like "32"
-- start_at :str -> Start at date in ISO  ISO 8601 format, YYYY-MM-DDTHH:MM:SS\[.mmmmmm]\[+HH:MM]
+- start_at :str -> Start at date in ISO 8601 format, YYYY-MM-DDTHH:MM:SS\[.mmmmmm]\[+HH:MM]
 - interval : Optional int -> Number of records to retrieve. Defaults to 100.
 
 returns
 - List\[dict]: List of measure records.
 
 <br>
-
-### **adopt_by_device_list**
-    Adopts a list of devices
-
-params
-- serial_numbers :List\[str] -> List of serial numbers
-
-returns.
-- dict: Structure with two List, one of adopted devices and other of errors.
-
-<br>
-
 
 ## Command list that the device supports
 1. Lock:

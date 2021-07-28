@@ -5,6 +5,7 @@ from sdk import (
     find_users,
     adopt_device_by_serial_number,
     find_device_by_id,
+    get_catalog_of_variables,
     get_devices,
     get_event_data,
     get_measures_data,
@@ -205,6 +206,11 @@ def test_subscribe_and_unsubscribe_webhook_with_auth():
     # Events will no longer received
     assert callback
 
+def test_get_catalog_of_variables():
+    set_access_token(USER_EMAIL, USER_PASSWORD)
+    result, _ = get_catalog_of_variables()
+    print(result)
+    assert result
 
 def test_get_data_measures():
     set_access_token(USER_EMAIL, USER_PASSWORD)

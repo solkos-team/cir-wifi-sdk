@@ -394,6 +394,18 @@ def get_measures_data(
         }
     )
 
+def get_catalog_of_variables():
+    """Fetch the catalog of variables and their name
+    
+    Returns:
+        List[dict]: List of variables
+    """
+    return api_request(
+        'get',
+        f'variables'
+    )
+
+
 def adopt_by_device_list(serial_numbers : List[str]):
     """Adopts a list of devices
 
